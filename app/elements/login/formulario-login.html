@@ -1,0 +1,54 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="formulario-login">
+    <template>
+      <style>
+        .campof{
+          padding: 0 15px 0 15px;
+          width: 280px;
+        }
+        h2{
+          color: #000;
+          margin: 15px 0 0 10px;
+        }
+        paper-button{
+          margin-top: 10px;
+          color: var(--primary-color);
+        }
+      </style>
+      <h2>Login</h2>
+      <p class="campof">
+        <paper-input label="Email" type="email" value="{{data.email}}"></paper-input>
+      </p>
+      <p class="campof">
+        <paper-input label="Passsword" type="password" value="{{data.password}}"></paper-input>
+      </p>
+      <p>
+        <paper-button on-tap="login" class="boton-accion-positivo">Loguearse</paper-button>
+      </p>
+      <p class="campof"><a href="/recuperar-clave" on-tap="recuperarClave">¿Olvidaste la clave?</a></p>
+    </template>
+
+    <script>
+    Polymer({
+      is: 'formulario-login',
+      properties: {
+        data: {
+          type: Object,
+          value: function() {
+            return {
+              email: '',
+              password: '',
+            };
+          }
+        }
+      },
+      login: function() {
+        this.fire('login-request', this.data);
+      },
+      recuperarClave: function() {
+        this.fire('click-recuperacion');
+      }
+    });
+    </script>
+</dom-module>

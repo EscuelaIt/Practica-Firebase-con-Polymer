@@ -1,0 +1,64 @@
+<script>
+FirebaseBehavior = {
+  properties: {
+    urlFirebase: {
+      type: String,
+      value: 'https://yep.firebaseio.com/'
+    }
+  },
+
+  // REFERENCIAS A todolist
+  locTodolist: function(idtl) {
+    var loc = this.urlFirebase + 'todolist/' + idtl;
+    //console.log('loc todolist', loc);
+    return loc;
+  },
+  locUserShared: function(idtl, user) {
+    var loc = this.urlFirebase + 'todolist/' + idtl + '/usersShared/' + user;
+    //console.log('loc locUserShared', loc);
+    return loc;
+  },
+  locUserCreator: function(idtl) {
+    var loc = this.urlFirebase + 'todolist/' + idtl + '/userCreator';
+    //console.log('loc locUserCreator', loc);
+    return loc;
+  },
+  locTodolistName: function(idtl) {
+    var loc = this.urlFirebase + 'todolist/' + idtl + '/name';
+    //console.log('loc todolist', loc);
+    return loc;
+  },
+  // REFERENCIAS A todos
+  locTodos: function(idtl) {
+    var loc = this.urlFirebase + 'todos/' + idtl;
+    //console.log('loc todos', loc);
+    return loc;
+  },
+
+  // REFERENCIAS A userTodolist
+  locUsertodolistUserList: function(idtl, user) {
+    var loc = this.urlFirebase + 'userTodolist/' + user + '/' + idtl;
+    //console.log('loc locUsertodolistUserList', loc);
+    return loc;
+  },
+
+  // REFERENCIAS A users
+  locUser: function(idus) {
+    var loc = this.urlFirebase + 'users/' + idus;
+    //console.log('loc user', loc);
+    return loc;
+  },
+
+  // REFERENCIAS A notifications
+  locNotifUser: function(idus) {
+    var loc = this.urlFirebase + 'notifications/' + idus;
+    //console.log('loc Notification User', loc);
+    return loc;
+  },
+  locNotifId: function(idus, notifid) {
+    var loc = this.urlFirebase + 'notifications/' + idus + '/' + notifid;
+    //console.log('loc Notification User id notif', loc);
+    return loc;
+  }
+};
+</script>

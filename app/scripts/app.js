@@ -51,4 +51,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     app.$.paperDrawerPanel.closeDrawer();
   };
 
+  app.msgToast = function(msg) {
+    app.$.toast.text = msg;
+    app.$.toast.open();
+  };
+
 })(document);

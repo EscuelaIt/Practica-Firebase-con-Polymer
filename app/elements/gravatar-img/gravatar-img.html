@@ -1,0 +1,82 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<!--
+An element providing a solution to no problem in particular.
+Example:
+    <gravatar-img email="someone@example.com" size="128" default-img="mm"></gravatar-img>
+@demo demo/index.html
+@hero hero.svg
+-->
+
+<dom-module id="gravatar-img">
+  <template>
+    <style>
+      :host {
+        display: inline-block;
+        box-sizing: border-box;
+      }
+      img{
+        display: block;
+        border-radius: 50%;
+        box-shadow: 2px 2px 2px #AAA;
+      }
+    </style>
+      <img hidden="{{!email}}" src$="[[gravatarUrl]]" alt="[[altText]]">
+  </template>
+
+  <script src="../../bower_components/js-md5/js/md5.min.js"></script>
+
+  <script>
+  (function() {
+    'use strict';
+    Polymer({
+      is: 'gravatar-img',
+      properties: {
+        altText: String,
+        email: String,
+        size: {
+          type: Number,
+          value: 80
+        },
+        defaultImg: {
+          type: String,
+          value: ''
+        },
+        secure: {
+          type: Boolean,
+          value: true
+        },
+        rating: {
+          type: String,
+          value: 'g'
+        },
+        forcedefault: {
+          type: Boolean,
+          value: false
+        },
+        gravatarUrl: {
+          type: String,
+          computed: '_computeGravatarUrl(email, size, secure, defaultImg, forcedefault, rating)'
+        }
+      },
+      _computeGravatarUrl: function(email, size, secure, defaultImg, forcedefault, rating) {
+        ////console.log('computando gravatarUrl');
+        var url = [
+          secure ? 'https' : 'http',
+          '://www.gravatar.com/avatar/',
+          md5(email.trim().toLowerCase()),
+          '.jpeg',
+          '?s=' + size,
+          //'&d=' + encodeURIComponent(defaultImg),
+          '&d=identicon',
+          '&r=' + rating
+        ].join('');
+        if (forcedefault) {
+          url += '&f=y';
+        }
+        return url;
+      }
+    });
+  })();
+  </script>
+</dom-module>

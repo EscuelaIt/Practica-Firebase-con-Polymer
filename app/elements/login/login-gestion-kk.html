@@ -1,0 +1,189 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="login-gestion">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+      .desk{
+        display: none;
+      }
+      @media (min-width: 800px) {
+        .desk{
+          display: inline-block;
+
+        }
+        .desk paper-button{
+          display: inline-block;
+        }
+        .devices{
+          display: none;
+        }
+      }
+      paper-spinner{
+        position: relative;
+        top: 10px;
+        --paper-spinner-layer-1-color: #69a;
+        --paper-spinner-layer-2-color: #6ff;
+        --paper-spinner-layer-3-color: #69a;
+        --paper-spinner-layer-4-color: #6ff;
+      }
+
+      .dialogoslogin{
+        background-color: white;
+        color: #666;
+        line-height: 20px;
+        border-radius: 3px;
+        box-shadow: 0px 2px 6px #ccc;
+        padding: 10px;
+        width: 75%;
+        max-width: 330px;
+      }
+      .avatar{
+        display: inline-block;
+      }
+      gravatar-img{
+        position: relative;
+        top: 10px;
+        left: 4px;
+      }
+    </style>
+
+    <firebase-auth
+        id="firebaseLogin"
+        user="{{user}}"
+        location="https://yep.firebaseio.com/"
+        provider="password"
+        on-user-created="userSuccessHandler"
+        on-error="errorHandlerMiguel"
+        on-login="loginHandler"
+    ></firebase-auth>
+
+    <firebase-document
+      id="firebasedocument"
+      data="{{userData}}"
+    ></firebase-document>
+
+    <paper-spinner active="{{loading}}"></paper-spinner>
+
+    <div class="avatar">
+      {{userData.nombre}} <gravatar-img email="[[userData.email]]" size="40"></gravatar-img>
+    </div>
+
+    <!-- para dispositivos -->
+    <paper-icon-button icon="social:person" on-tap="muestraLogin" class="devices" hidden="{{user}}"></paper-icon-button>
+    <paper-icon-button icon="social:person-add" on-tap="muestraRegistro" class="devices" hidden="{{user}}"></paper-icon-button>
+    <paper-icon-button icon="exit-to-app" on-tap="logout" class="devices" hidden="{{!user}}"></paper-icon-button>
+
+    <!-- para escritorio -->
+    <paper-button on-tap="muestraLogin" class="desk" hidden="{{user}}">
+      <iron-icon icon="social:person"></iron-icon> Login
+    </paper-button>
+    <paper-button on-tap="muestraRegistro" class="desk" hidden="{{user}}">
+      <iron-icon icon="social:person-add"></iron-icon> Registro
+    </paper-button>
+    <paper-button on-tap="logout" class="desk" hidden="{{!user}}">
+      <iron-icon icon="exit-to-app"></iron-icon> Logout
+    </paper-button>
+
+
+    <iron-dropdown horizontal-align="right" vertical-align="top" vertical-offset="40" id="dropregistro" class="dialogoslogin">
+      <formulario-registro class="dropdown-content" on-register-request="registrar" data="{{registerData}}"></formulario-registro>
+    </iron-dropdown>
+    <iron-dropdown vertical-align="top" vertical-offset="40" horizontal-align="right" id="droplogin" class="dialogoslogin">
+      <formulario-login class="dropdown-content" on-login-request="dologin"></formulario-login>
+    </iron-dropdown>
+  </template>
+  <script>
+  (function() {
+    'use strict';
+
+    Polymer({
+      is: 'login-gestion',
+
+      properties: {
+        loading: {
+          type: Boolean,
+          value: false
+        },
+        user: {
+          type: Object,
+          observer: '_cambiosUser'
+        },
+        primerAcceso: {
+          type: Boolean,
+          value: false
+        }
+      },
+      _cambiosUser: function(){
+        console.log("user:", this.user);
+        if(this.user){
+          this.$.firebasedocument.location = "https://yep.firebaseio.com/users/" + this.user.uid;
+        }else{
+          this.$.firebasedocument.location = "";
+        }
+      },
+      muestraLogin: function() {
+        this.$.droplogin.open();
+      },
+      muestraRegistro: function() {
+        this.$.dropregistro.open();
+      },
+      dologin: function(e, data) {
+        this.$.droplogin.close();
+        this.loading = true;
+        this.$.firebaseLogin.login({
+          email: data.email,
+          password: data.password
+        });
+      },
+      registrar: function(e, data) {
+        this.$.dropregistro.close();
+        this.loading = true;
+        this.$.firebaseLogin.createUser(data.email, data.password);
+      },
+      userSuccessHandler: function() {
+        //this.loading = false;
+        app.msgToast("Usuario registrado!");
+        this.$.firebaseLogin.login({
+          email: this.registerData.email,
+          password: this.registerData.password
+        });
+        this.primerAcceso = true;
+      },
+      errorHandlerMiguel: function(e) {
+        this.loading = false;
+        //debugger;
+        app.msgToast("error: " + e.detail.message + " " + e.detail.code);
+      },
+      loginHandler: function() {
+        this.loading = false;
+        if(this.primerAcceso) {
+          console.log(this.user.uid);
+          this.$.firebasedocument.location = "https://yep.firebaseio.com/users/" + this.user.uid;
+          this.userData = {
+            provider: this.user.auth.provider,
+            nombre: this.registerData.nombre,
+            apellidos: this.registerData.apellidos,
+            email: this.registerData.email
+          };
+        }
+      },
+      logout: function() {
+        this.$.firebaseLogin.logout();
+      }
+    });
+  })();
+  </script>
+</dom-module>
