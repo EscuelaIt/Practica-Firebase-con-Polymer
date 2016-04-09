@@ -94,8 +94,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
           <span class="space"></span>
 
+          <notifications-alert user="{{user}}"></notifications-alert>
+
           <!-- Toolbar icons -->
-          <login-gestion></login-gestion>
+          <login-gestion user="{{user}}"></login-gestion>
 
           <!-- Application name -->
           <div class="middle middle-container">
@@ -110,7 +112,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <section data-route="home">
               <paper-material elevation="1">
                 <h2 class="page-title">Bienvenidos</h2>
-
+                <todolist-insertar user="{{user}}"></todolist-insertar>
+                <todolist-listado user="{{user}}"></todolist-listado>
               </paper-material>
             </section>
 
@@ -118,6 +121,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               <paper-material elevation="1">
                 <h2 class="page-title">Acerca de</h2>
                 <p>Esta app la hacemos para aprender Firebase con Polymer</p>
+              </paper-material>
+            </section>
+
+            <section data-route="todolist">
+              <paper-material elevation="1">
+                <todolist-elemento idtodolist="{{params.id}}" user="{{user}}"
+                  on-compartir-todolist="compartirTodolist"
+                ></todolist-elemento>
               </paper-material>
             </section>
 
@@ -147,6 +158,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       </platinum-sw-cache>
     </platinum-sw-register>
     -->
+    <todolist-compartir id="elshare" user="{{user}}" idtodolist="{{idtodolistaccion}}"></todolist-compartir>
 
   </template>
 

@@ -1,0 +1,103 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="avatar-usuario">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+      .accionpequena {
+        --paper-icon-button: {
+          width: 32px;
+          height: 32px;
+        }
+      }
+    </style>
+    <firebase-document
+      location="{{locationUser}}"
+      data="{{userData}}"
+    ></firebase-document>
+    <paper-icon-item>
+      <gravatar-img email="{{userData.email}}" size="40" item-icon></gravatar-img>
+      <paper-item-body>
+        <div>{{userData.nombre}}</div>
+        <div secondary>{{userData.email}}</div>
+      </paper-item-body>
+      <paper-icon-button  hidden="{{verCompartir}}" icon="clear" class="accionpequena acciondanger" on-tap="quitarUserShared"></paper-icon-button>
+    </paper-icon-item>
+  </template>
+  <script>
+  (function() {
+    'use strict';
+
+    Polymer({
+      is: 'avatar-usuario',
+
+      behaviors: [FirebaseBehavior],
+
+      properties: {
+        idusuario: {
+          type: String
+        },
+        locationUser: {
+          type: String,
+          computed: "calculaLocationUser(idusuario)"
+        },
+        verCompartir: {
+          type: Boolean,
+          computed: "_esVisibleCompartir(todolist, user)"
+        },
+        todolist: Object,
+        idtodolist: String
+      },
+      quitarUserShared: function() {
+        ////console.log("borrarias,,,");
+        var that = this;
+        var ref = new Firebase(this.locUserShared(this.idtodolist, this.idusuario));
+        ref.remove(function(error){
+          if(error){
+            app.msgToast('Error borrando el usuario compartido');
+            return false;
+          }
+          //tengo que borrar posibles notificaciones al usuario "shared" sobre esta idtodolist
+          that._borrarNotifUser();
+          app.msgToast('Usuario compartido borrado');
+        });
+
+      },
+
+      _borrarNotifUser: function(){
+        var refnotif = new Firebase(this.locNotifUser(this.idusuario));
+        var that = this;
+        refnotif.orderByChild('idtodolist').equalTo(this.idtodolist).once('value', function(snapshot) {
+          ////console.log("aki una notif:", snapshot.val());
+          for (var notificacionid in snapshot.val()) {
+            var notifref = new Firebase(that.locNotifId(that.idusuario, notificacionid));
+            notifref.remove();
+          }
+        });
+      },
+
+      _esVisibleCompartir: function(tl, us) {
+        if(!tl){
+          return false;
+        }
+        return !(tl.userCreator === us.uid);
+      },
+      calculaLocationUser: function(id){
+        return this.urlFirebase + "users/" + id;
+      }
+    });
+  })();
+  </script>
+</dom-module>

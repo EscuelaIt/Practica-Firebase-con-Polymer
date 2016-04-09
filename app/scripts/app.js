@@ -56,4 +56,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     app.$.toast.open();
   };
 
+  app.compartirTodolist = function(e, id) {
+    app.idtodolistaccion = id;
+    app.$.elshare.compartir();
+  }
 })(document);

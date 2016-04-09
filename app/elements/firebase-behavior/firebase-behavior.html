@@ -8,13 +8,26 @@ FirebaseBehavior = {
   },
 
   // REFERENCIAS A todolist
-  locTodolist: function(idtl) {
-    var loc = this.urlFirebase + 'todolist/' + idtl;
+  locTodolistListado: function() {
+    var loc = this.urlFirebase + 'todolist';
     //console.log('loc todolist', loc);
     return loc;
   },
+  locTodolist: function(idtl) {
+    if(idtl) {
+      var loc = this.urlFirebase + 'todolist/' + idtl;
+      //console.log('loc todolist', loc);
+      return loc;
+    }
+    return '';
+  },
   locUserShared: function(idtl, user) {
     var loc = this.urlFirebase + 'todolist/' + idtl + '/usersShared/' + user;
+    //console.log('loc locUserShared', loc);
+    return loc;
+  },
+  locListadoUserShared: function(idtl) {
+    var loc = this.urlFirebase + 'todolist/' + idtl + '/usersShared/';
     //console.log('loc locUserShared', loc);
     return loc;
   },
@@ -34,11 +47,21 @@ FirebaseBehavior = {
     //console.log('loc todos', loc);
     return loc;
   },
+  locTodosId: function(idtl, idt) {
+    var loc = this.urlFirebase + 'todos/' + idtl + "/" + idt;
+    console.log('loc todos', loc);
+    return loc;
+  },
 
   // REFERENCIAS A userTodolist
   locUsertodolistUserList: function(idtl, user) {
     var loc = this.urlFirebase + 'userTodolist/' + user + '/' + idtl;
     //console.log('loc locUsertodolistUserList', loc);
+    return loc;
+  },
+  locUsertodolistUser: function(user) {
+    var loc = this.urlFirebase + 'userTodolist/' + user;
+    //console.log('loc locUsertodolistUser', loc);
     return loc;
   },
 

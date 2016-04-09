@@ -1,0 +1,82 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="notifications-alert">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+      div{
+        border-radius: 3px;
+        background-color: var(--primary-background-color);
+        color: var(--accent-color);
+        padding: 8px;
+        margin-right: 10px;
+        cursor: pointer;
+      }
+      .nonotif{
+        color: var(--light-accent-color)
+      }
+      .alerta{
+        color: #900;
+      }
+    </style>
+    <firebase-collection
+      id="noticollection"
+      data="{{notifications}}"
+      location="{{locnotif}}"
+    ></firebase-collection>
+    <div class$="{{classNotif}}" on-tap="muestraNotificaciones">
+      <iron-icon icon="social:notifications"></iron-icon>
+      <span hidden="{{!notifications.length}}" class="alerta">{{notifications.length}}</span>
+    </div>
+  </template>
+  <script>
+  (function() {
+    'use strict';
+
+    Polymer({
+      is: 'notifications-alert',
+
+      behaviors: [FirebaseBehavior],
+
+      properties: {
+        locnotif: {
+          type: String,
+          computed: 'locNotifUser(user.uid)'
+        },
+        notifications: {
+          type: Array,
+          value: function() {
+            return [];
+          },
+          notify: true
+        },
+        classNotif: {
+          type: String,
+          value: ''
+        }
+      },
+      observers: ['cambiaNotifications(notifications.splices)'],
+
+      cambiaNotifications: function() {
+        ////console.log('-', this.notifications.length)
+        this.classNotif = (this.notifications.length === 0)? 'nonotif' : '';
+      },
+      muestraNotificaciones: function() {
+        page('/notificaciones');
+      }
+    });
+  })();
+  </script>
+</dom-module>

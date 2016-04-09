@@ -1,0 +1,61 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="todolist-listado-item">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <firebase-document
+      id="fd"
+      data="{{todolist}}"
+      location="{{location}}"
+    ></firebase-document>
+    <paper-icon-item on-tap="verTodolist">
+      <iron-icon icon="assignment" item-icon></iron-icon>
+      <paper-item-body>{{todolist.name}}</paper-item-body>
+      <paper-icon-button hidden="{{!verCompartir}}" icon="supervisor-account" class="accionpequena accioncolor" on-tap="compartir"></paper-icon-button>
+      <paper-icon-button icon="create" class="accionpequena accioncolor" on-tap="editar"></paper-icon-button>
+      <paper-icon-button icon="delete" class="accionpequena acciondanger" on-tap="borrar"></paper-icon-button>
+    </paper-icon-item>
+  </template>
+  <script>
+  (function() {
+    'use strict';
+
+    Polymer({
+      is: 'todolist-listado-item',
+
+      behaviors: [FirebaseBehavior],
+
+      properties: {
+        user: Object,
+        idtodolist: String,
+        todolist: {
+          type: Object
+        },
+        location: {
+          type: String,
+          value: '',
+          computed: 'locTodolist(idtodolist)'
+        }
+      },
+      verTodolist: function() {
+        console.log(this.idtodolist)
+        page('/todolist/' + this.idtodolist);
+      }
+    });
+  })();
+  </script>
+</dom-module>

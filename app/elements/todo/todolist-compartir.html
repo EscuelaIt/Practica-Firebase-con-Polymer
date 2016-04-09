@@ -1,0 +1,127 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="todolist-compartir">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+      p {
+        width: 300px;
+        margin-bottom: 0;
+      }
+    </style>
+    <firebase-document
+      location="{{locationname}}"
+      data="{{name}}"
+    ><firebase-document>
+    <paper-dialog id="dcompartir" on-iron-overlay-closed="cerrandoDialog" modal>
+      <h2>Compartir</h2>
+      <p>Indica el email del usuario con el que quieres compartir esta TODO List.</p>
+      <paper-input label="Email" value="{{email}}" on-focus="escribiendo" on-keydown="checkForEnter"
+      ></paper-input>
+      <div hidden="{{!errorEmail}}" class="error">{{errorEmail}}</div>
+      <div class="buttons">
+        <paper-button dialog-dismiss class="boton-accion-positivo">Cancelar</paper-button>
+        <paper-button class="boton-accion-positivo" on-tap="enviarEmailCompartir">Compartir</paper-button>
+      </div>
+    </paper-dialog>
+  </template>
+  <script>
+  (function() {
+    'use strict';
+
+    Polymer({
+      is: 'todolist-compartir',
+
+      behaviors: [FirebaseBehavior, FormularioBehavior],
+
+      properties: {
+        email: {
+          type: String,
+          value: ''
+        },
+        user: Object,
+        locationname: {
+          type: String,
+          computed: 'locTodolistName(idtodolist)'
+        }
+      },
+      crear: function() {
+        this.enviarEmailCompartir();
+      },
+      escribiendo: function(){
+        if(this.errorEmail) {
+          this.errorEmail = null;
+        }
+      },
+      enviarEmailCompartir: function() {
+        this.errorEmail = null;
+        ////console.log("confirmado");
+        if(! this.validateEmail(this.email)) {
+          this.errorEmail = "No es un email válido";
+          //console.log("no es valido");
+          return false;
+        }
+        var ref = new Firebase(this.urlFirebase + "users");
+        var that = this;
+        ref.orderByChild("email").equalTo(this.email).once("value", function(snapshot) {
+          //console.log(snapshot.key(), snapshot.val());
+          if(snapshot.numChildren() === 0) {
+            that.errorEmail = "No encontré un usuario con ese email";
+            return false;
+          }
+          if(snapshot.numChildren() > 1){
+            app.msgToast('No debería encontrar dos ' + snapshot.numChildren() + ' usuarios con ese email');
+            //return false;
+          }
+          snapshot.forEach(function(usersnapshot) {
+            var usuarioACompartir = usersnapshot.key();
+            if(usuarioACompartir == that.user.uid){
+              that.errorEmail = 'No puedes compartir contigo mismo';
+              return false;
+            };
+            //estoy aki es que debo crear un registro en los usuarios shared de esta todolist
+            var loc = that.locUserShared(that.idtodolist, usuarioACompartir);
+            var ref = new Firebase(loc);
+            ref.set(true, function() {
+              var refNotifUser = new Firebase(that.locNotifUser(usuarioACompartir));
+              var objNotificacion = {
+                idtodolist: that.idtodolist,
+                iduser: that.user.uid,
+                todolistName: that.name
+              }
+              refNotifUser.push(objNotificacion, function(){
+                app.msgToast('Enviada invitación a la TODO List');
+                that.$.dcompartir.close();
+              });
+            });
+            return true; //solo itero 1 vez en el forEach (solo debería haer uno, la verdad)
+          });
+        });
+      },
+      compartir: function() {
+        if (!this.user) {
+          app.msgToast('Incapaz de compartir');
+          return 0;
+        }
+        this.$.dcompartir.open();
+      },
+      cerrandoDialog: function() {
+        this.errorEmail = null;
+        this.email = "";
+      }
+    });
+  })();
+  </script>
+</dom-module>

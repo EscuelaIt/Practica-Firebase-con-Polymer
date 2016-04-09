@@ -1,0 +1,131 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="todolist-elemento">
+  <template>
+    <style>
+    header {
+      border-bottom: 3px solid var(--dark-primary-color);
+      padding: 8px 15px 8px 0;
+      color: var(--accent-color);
+      display: table;
+      width: 95%;
+      margin: 0 20px 0 0;
+    }
+    header h2{
+      margin: 0;
+    }
+    todo-insertar {
+      margin-bottom: 20px;
+    }
+    section{
+      width: 60%;
+      padding: 15px;
+      display: table-cell;
+    }
+    #sharedsection {
+      border-left: 2px solid #eee;
+      width: 40%;
+    }
+    h3{
+      font-size: 1em;
+    }
+    @media (max-width: 950px) {
+      section{
+        display: block;
+        width: 100%;
+      }
+      #sharedsection {
+        width: 100%;
+        border: none;
+      }
+    }
+    </style>
+    <firebase-document
+      id="todolistdocument"
+      data="{{todolist}}"
+      location="{{locationTodolist}}"
+    ></firebase-document>
+    <firebase-document
+      id="creatordocument"
+      data="{{creator}}"
+      location="{{locationcreatordocument}}"
+    ></firebase-document>
+    <firebase-collection
+      id="todoscollection"
+      data="{{todos}}"
+      location="{{locationtodosdocument}}"
+    ></firebase-collection>
+    <firebase-collection
+      id="coleccionshares"
+      data="{{usuariosCompartidos}}"
+      location="{{locationShares}}"
+    ></firebase-collection>
+    <header>
+      <span class="lado izquierda"><h2>{{todolist.name}}</h2></span>
+      <span class="lado derecha"><gravatar-img email="{{creator.email}}" size="40"></gravatar-img></span>
+    </header>
+    <todo-insertar user="{{user}}" idtodolist="{{idtodolist}}"></todo-insertar>
+    <section id="todossection">
+      <h3>Tareas</h3>
+      <template is="dom-repeat" items="{{todos}}">
+        <todo-elemento idtodo="{{item.__firebaseKey__}}" idtodolist="{{idtodolist}}" user=""></todo-elemento>
+      </template>
+      <section id="sharedsection">
+      <h3>Compartida con los usuarios</h3>
+      <p hidden="{{verCompartir}}"><paper-button class="boton-accion-positivo" on-tap="compartir">Compartir</paper-button></p>
+      <template is="dom-repeat" items="{{usuariosCompartidos}}">
+        <avatar-usuario idusuario="{{item.__firebaseKey__}}" idtodolist="{{idtodolist}}" todolist="{{todolist}}" user="{{user}}"></avatar-usuario>
+      </template>
+    </section>
+    </section>
+  </template>
+  <script>
+  (function() {
+    'use strict';
+
+    Polymer({
+      is: 'todolist-elemento',
+
+      behaviors: [FirebaseBehavior],
+
+      properties: {
+        idtodolist: String,
+        todolist: Object,
+        locationTodolist: {
+          type: String,
+          value: '',
+          computed: 'locTodolist(idtodolist)'
+        },
+        locationcreatordocument: {
+          type: String,
+          computed: 'locUser(todolist.userCreator)'
+        },
+        locationtodosdocument:{
+          type: String,
+          computed: 'locTodos(idtodolist)'
+        },
+        locationShares: {
+          type: String,
+          value: '',
+          computed: 'locListadoUserShared(idtodolist)'
+        },
+      },
+
+      compartir: function() {
+        this.fire('compartir-todolist', this.idtodolist);
+      }
+
+    });
+  })();
+  </script>
+</dom-module>

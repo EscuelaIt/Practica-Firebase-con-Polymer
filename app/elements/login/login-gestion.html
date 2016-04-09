@@ -55,7 +55,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
       gravatar-img{
         position: relative;
-        top: 10px;
+        height: 30px;
         left: 4px;
       }
     </style>
@@ -116,7 +116,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         },
         user: {
           type: Object,
-          observer: '_cambiosUser'
+          observer: '_cambiosUser',
+          notify: true
         },
         primerAcceso: {
           type: Boolean,

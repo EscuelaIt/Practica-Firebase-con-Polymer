@@ -1,0 +1,75 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="todolist-insertar">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <div id="divinsertar">
+      <span class="lado input"><paper-input label="Crear nueva TODO-List" on-keydown="checkForEnter" value="{{todolistName}}"></paper-input></span>
+      <span class="lado boton"><paper-icon-button icon="add" class="botoninsertar" on-tap="crear"></paper-icon-button></span>
+    </div>
+  </template>
+  <script>
+  (function() {
+    'use strict';
+
+    Polymer({
+      is: 'todolist-insertar',
+
+      behaviors: [FirebaseBehavior, FormularioBehavior],
+
+      properties: {
+        todolistName: {
+          type: String,
+          value: ''
+        },
+        user: Object
+      },
+      crear: function() {
+        if (!this.user) {
+          app.msgToast("Usuario no definido");
+          return 0;
+        }
+        if (this.todolistName.length === 0){
+          app.msgToast("Indica un nombre de todolist");
+          return 0;
+        }
+
+        var that = this;
+        var ref = new Firebase(this.locTodolistListado());
+        var refTodoList = ref.push({
+          name: this.todolistName,
+          userCreator: this.user.uid,
+          deleted: false
+        }, function(error){
+          if(error) {
+            app.msgToast("No se pudo insertar la TODO List");
+          } else {
+            ////console.log("ref",  this.urlFirebase + 'userTodolist/' + this.user.uid);
+            that.crearUserTodoList(refTodoList.key());
+            app.msgToast("Creada la TODO List");
+          }
+        });
+        this.todolistName = '';
+      },
+      crearUserTodoList: function(id){
+        var ref = new Firebase(this.locUsertodolistUserList(id, this.user.uid));
+        ref.set(true);
+      }
+    });
+  })();
+  </script>
+</dom-module>
